@@ -1,7 +1,7 @@
 <?php
 
 $plugin['name'] = 'sed_plugin_library';
-$plugin['version'] = '0.1';
+$plugin['version'] = '0.2';
 $plugin['author'] = 'Stephen Dickinson';
 $plugin['author_uri'] = 'txp-plugins.netcarving.com';
 $plugin['description'] = "Helper functions for sed plugins.";
@@ -32,27 +32,41 @@ div#sed_help h3 { color: #693; font: bold 12px Arial, sans-serif; letter-spacing
 
 h1(#intro). Plugin Library
 
-sed_plugin_library v0.1 (June 6th, 2006)
+sed_plugin_library v0.2 (June 9th, 2006)
 
 Provides some useful helper functions for plugins.
 
 h2(#functions). Function Listing
 
-|_. Function |_. Description |
-| _extract_packed_vars | 	Returns an array of key->value mappings parsed from all the sections of a packed string. |
-| _extract_packed_variable_section | 	Returns an array of key->value mappings parsed from one section of a packed string. |
+|_. Function                         |_. Description |
+| @_extract_name_value_pairs@        | Returns an array of name value pairs from the _variable-list_ it is given. |
+| @_extract_packed_vars@             | Returns an array of key->value mappings parsed from all the sections of a _packed-string_. |
+| @_extract_packed_variable_section@ | Returns an array of key->value mappings parsed from one section of a _packed-string_. |
 
-Formats...
+h2(#formats). Formats
 
-*packed string* ... _section_ ['|' _section_ ]
-*section* ... _section-name_ '(' _variable-list_ ')' 
-*variable-list* ... name='value' [ ';' variable-list ] 
+*packed string* :: _section_ ['|' _section_ ] 
+*section*       :: section-name '(' _variable-list_ ')'  
+*variable-list* :: name='value' [ ';' variable-list ] 
 
 h3(#examples). Examples
 
-$string = "copyright(owner='Steve';start='1970')|location(state='sabah')|personal(dob='1/1/01';email='';phone='')";
+Here is a valid variable-list...
+
+a='1' ; b='2' ; Hello='Goodbye'
+
+Here is a valid packed-string...
+
+copyright(owner='Steve';start='1970')|location(state='sabah')|personal(dob='1/1/01';email='';phone='')
+
+Notice that a packed string includes one or more variable lists. Each list is wrapped in parenthasis, given a prefixed name and separated from the next section by the '|'
+ character.
 
 h2(#versions). Version History
+
+v0.2
+
+* Pulled out the variable list parsing code into a common function @_extract_name_value_pairs@.
 
 v0.1
 
@@ -66,84 +80,86 @@ v0.1
 
 # --- BEGIN PLUGIN CODE ---
 
-/*
-	Returns an array of key->value mappings parsed from all the sections of a packed string.
-*/
+/* parses a string for a name='value' list */
 
+function _extract_name_value_pairs( $content , $prefix='', $section_name='' , $attach_name=false, $variable_delim_char=';', $sep_char='_' ) { 
+	$result = array();
+	
+	$content = trim( $content );
+	if( empty( $content ) )
+		return $result;
+
+	$chunks = explode( $variable_delim_char , $content );
+	//
+	//	Build the result array mapping 
+	//  [ variable_x => value_x ]
+	//
+	if( 0 == count( $chunks ) )
+		return $result;
+
+	foreach( $chunks as $chunk ) {
+		$chunk = trim( $chunk );
+		if( empty( $chunk ) ) 
+			continue;
+		
+		list( $storage_key, $value ) = explode( '=', $chunk );
+		
+		$storage_key = trim($storage_key);
+		if( empty( $storage_key ) )
+			continue;
+		
+		if( $attach_name and !empty($section_name) ) 
+			$storage_key = trim($section_name).$sep_char.$storage_key;
+		if( !empty( $prefix) ) 
+			$storage_key = trim($prefix).$sep_char.$storage_key;
+		
+		$result[ $storage_key ] = trim( $value, " '\"" );
+		}
+	return $result;
+	}
+
+
+/*	Returns an array of key->value mappings parsed from all the sections of a packed string. */
 function _extract_packed_vars( $packed_string, $prefix='', $attach_name=true, $section_char='|', $variable_delim_char=';' ) {
 	$result = array();
 
-//	print_r( "Prefix / Section Delimiter / variable delimiter / Packed String.<br/>\n" ); 
-//	print_r( $prefix.' / "'.$section_char.'" / "'.$variable_delim_char."\" / ".$packed_string."<br/>\n" );
-	
 	if( empty( $packed_string ) )
 		return false;
-	
 	//
 	//	Break the packed string on the section boundaries...
 	//	
 	$sections = explode( $section_char , $packed_string );
 	$count = count( $sections );
-//	print_r( "Found $count sections.<br/>\n" );
 	if( 0 == $count ) 
 		return false;
 
 	foreach( $sections as $section ) {
 		//
 		//	Pull out the section name
+		//
 		$section_len = strlen( $section );
 		$len = strpos( $section , '(' );
 		$section_name = substr( $section , 0 , $len );
 		$content = substr( $section , $len + 1 , ($section_len - $len - 2) );
-//		print_r( "Processing Section: [$section]. Section length=$section_len, Name Length=$len<br/>&nbsp;&nbsp;&nbsp;Content=[$content].<br/>\n" );
-
-		//
-		//	Split this section on the variable delimiter...
-		//
-		$chunks = explode( $variable_delim_char , $content );
-//		$chunk_count = count( $chunks );
-		
-//		print_r( "Section '$section_name' exploded into $chunk_count chunks.<br/>\n" );
-//		print_r( $chunks );
-//		print_r( "<br>\n" );
-		//
-		//	Build the result array mapping 
-		//  [ variable_x => value_x ]
-		//
-		foreach( $chunks as $chunk ) {
-			list( $storage_key, $value ) = explode( '=', $chunk );
-//			print_r( "Chunk [$chunk] -> Found key [$storage_key] and value [$value].<br/>\n" );
-			if( $attach_name ) $storage_key = $section_name.'_'.$storage_key;
-			if( !empty( $prefix) ) $storage_key = $prefix.'_'.$storage_key;
-			$result[ $storage_key ] = trim( $value, " '\"" );
-			}
+		$result = _extract_name_value_pairs( $content, $prefix, $section_name, $attach_name, $variable_delim_char );
 		}
-	
 	return $result;
 	}
 
 	
-/*
-	Returns an array of key->value mappings parsed from one section of a packed string.
-*/
+/*	Returns an array of key->value mappings parsed from one section of a packed string. */
 function _extract_packed_variable_section( $section_name, $packed_string, $prefix='', $attach_name=false, $section_char='|', $variable_delim_char=';' ) {
 	$result = array();
 
-//	print_r( "Section Name / Prefix / Section Delimiter / variable delimiter / Packed String.<br/>\n" ); 
-//	print_r( $section_name.' / '.$prefix.' / "'.$section_char.'" / "'.$variable_delim_char."\" / ".$packed_string."<br/>\n" );
-	
 	if( empty( $packed_string ) or empty( $section_name ) )
 		return false;
-	
 	//
 	//	Break the packed string on the section boundaries...
 	//	
 	$sections = explode( $section_char , $packed_string );
 	$count = count( $sections );
-//	print_r( "Found $count sections.<br/>\n" );
 	if( 0 == $count ) 
 		return false;
-
 	//
 	//	Find the section with the matching prefix. If it is not present 
 	// then return false.
@@ -162,31 +178,14 @@ function _extract_packed_variable_section( $section_name, $packed_string, $prefi
 			}
 		}
 	if( '' === $section ) {
-//		print_r( "Failed to find section: $section_name in variables. Exiting." );
 		return false;
 		}
-
-//	print_r( "Found section: $section_name in variables. Unpacking it now.<br/>\n" );
 	//
 	//	Split this section on the variable delimiter...
 	//
 	$section_len = strlen( $section );
 	$content = substr( $section , $len + 1 , $section_len - $len - 2 );
-//	print_r( "Content [$content].<br>\n" );
-	$chunks = explode( $variable_delim_char , $content );
-	
-	//
-	//	Build the result array mapping 
-	//  [ variable_x => value_x ]
-	//
-	foreach( $chunks as $chunk ) {
-		list( $storage_key, $value ) = explode( '=', $chunk );
-//		print_r( "Chunk [$chunk] -> Found key [$storage_key] and value [$value].<br/>\n" );
-		if( $attach_name ) $storage_key = $section_name.'_'.$storage_key;
-		if( !empty( $prefix) ) $storage_key = $prefix.'_'.$storage_key;
-		$result[ $storage_key ] = trim( $value, " '\"" );
-		}
-	
+	$result = _extract_name_value_pairs( $content, $prefix, $section_name, $attach_name, $variable_delim_char );
 	return $result;
 	}
 
