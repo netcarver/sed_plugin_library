@@ -3,7 +3,7 @@
 $plugin['name'] = 'sed_plugin_library';
 $plugin['version'] = '0.3';
 $plugin['author'] = 'Stephen Dickinson';
-$plugin['author_uri'] = 'txp-plugins.netcarving.com';
+$plugin['author_uri'] = 'http://txp-plugins.netcarving.com';
 $plugin['description'] = "Helper functions for sed plugins.";
 
 $plugin['type'] = 2; // 0 = regular plugin; public only, 1 = admin plugin; public + admin, 2 = library
