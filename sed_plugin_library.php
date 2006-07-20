@@ -1,7 +1,7 @@
 <?php
 
 $plugin['name'] = 'sed_plugin_library';
-$plugin['version'] = '0.2';
+$plugin['version'] = '0.3';
 $plugin['author'] = 'Stephen Dickinson';
 $plugin['author_uri'] = 'txp-plugins.netcarving.com';
 $plugin['description'] = "Helper functions for sed plugins.";
@@ -32,16 +32,18 @@ div#sed_help h3 { color: #693; font: bold 12px Arial, sans-serif; letter-spacing
 
 h1(#intro). Plugin Library
 
-sed_plugin_library v0.2 (June 9th, 2006)
+sed_plugin_library v0.3 (June 18th, 2006)
 
 Provides some useful helper functions for plugins.
 
 h2(#functions). Function Listing
 
 |_. Function                         |_. Description |
-| @_extract_name_value_pairs@        | Returns an array of name value pairs from the _variable-list_ it is given. |
-| @_extract_packed_vars@             | Returns an array of key->value mappings parsed from all the sections of a _packed-string_. |
-| @_extract_packed_variable_section@ | Returns an array of key->value mappings parsed from one section of a _packed-string_. |
+| @sed_lib_extract_name_value_pairs@        | Returns an array of name value pairs from the _variable-list_ it is given. |
+| @sed_lib_extract_packed_vars@             | Returns an array of key->value mappings parsed from all the sections of a _packed-string_. |
+| @sed_lib_extract_packed_variable_section@ | Returns an array of key->value mappings parsed from one section of a _packed-string_. |
+| @sed_lib_print_keys@                      | Echo's the keys of a given array without the values being shown. |
+| @sed_lib_print_vals@                      | Echo's the values of a given array without the keys being shown. |
 
 h2(#formats). Formats
 
@@ -64,6 +66,11 @@ Notice that a packed string includes one or more variable lists. Each list is wr
 
 h2(#versions). Version History
 
+v0.3
+
+* Renamed functions.
+* Changed help files.
+
 v0.2
 
 * Pulled out the variable list parsing code into a common function @_extract_name_value_pairs@.
@@ -81,8 +88,8 @@ v0.1
 # --- BEGIN PLUGIN CODE ---
 
 /* parses a string for a name='value' list */
-
-function _extract_name_value_pairs( $content , $prefix='', $section_name='' , $attach_name=false, $variable_delim_char=';', $sep_char='_' ) { 
+function sed_lib_extract_name_value_pairs( $content , $prefix='', $section_name='' , $attach_name=false, $variable_delim_char=';', $sep_char='_' ) 
+	{ 
 	$result = array();
 	
 	$content = trim( $content );
@@ -97,7 +104,8 @@ function _extract_name_value_pairs( $content , $prefix='', $section_name='' , $a
 	if( 0 == count( $chunks ) )
 		return $result;
 
-	foreach( $chunks as $chunk ) {
+	foreach( $chunks as $chunk ) 
+		{
 		$chunk = trim( $chunk );
 		if( empty( $chunk ) ) 
 			continue;
@@ -118,9 +126,8 @@ function _extract_name_value_pairs( $content , $prefix='', $section_name='' , $a
 	return $result;
 	}
 
-
 /*	Returns an array of key->value mappings parsed from all the sections of a packed string. */
-function _extract_packed_vars( $packed_string, $prefix='', $attach_name=true, $section_char='|', $variable_delim_char=';' ) {
+function sed_lib_extract_packed_vars( $packed_string, $prefix='', $attach_name=true, $section_char='|', $variable_delim_char=';' ) {
 	$result = array();
 
 	if( empty( $packed_string ) )
@@ -133,7 +140,8 @@ function _extract_packed_vars( $packed_string, $prefix='', $attach_name=true, $s
 	if( 0 == $count ) 
 		return false;
 
-	foreach( $sections as $section ) {
+	foreach( $sections as $section ) 
+		{
 		//
 		//	Pull out the section name
 		//
@@ -141,14 +149,13 @@ function _extract_packed_vars( $packed_string, $prefix='', $attach_name=true, $s
 		$len = strpos( $section , '(' );
 		$section_name = substr( $section , 0 , $len );
 		$content = substr( $section , $len + 1 , ($section_len - $len - 2) );
-		$result = _extract_name_value_pairs( $content, $prefix, $section_name, $attach_name, $variable_delim_char );
+		$result = sed_lib_extract_name_value_pairs( $content, $prefix, $section_name, $attach_name, $variable_delim_char );
 		}
 	return $result;
 	}
 
-	
 /*	Returns an array of key->value mappings parsed from one section of a packed string. */
-function _extract_packed_variable_section( $section_name, $packed_string, $prefix='', $attach_name=false, $section_char='|', $variable_delim_char=';' ) {
+function sed_lib_extract_packed_variable_section( $section_name, $packed_string, $prefix='', $attach_name=false, $section_char='|', $variable_delim_char=';' ) {
 	$result = array();
 
 	if( empty( $packed_string ) or empty( $section_name ) )
@@ -171,13 +178,15 @@ function _extract_packed_variable_section( $section_name, $packed_string, $prefi
 		$s = $sections[$i];
 		if( $s{$len} === '(' )
 			{
-			if( substr( $s , 0 , $len ) == $section_name ) {
+			if( substr( $s , 0 , $len ) == $section_name ) 
+				{
 				$section = $s;
 				$i = $count;
 				}
 			}
 		}
-	if( '' === $section ) {
+	if( '' === $section ) 
+		{
 		return false;
 		}
 	//
@@ -185,10 +194,31 @@ function _extract_packed_variable_section( $section_name, $packed_string, $prefi
 	//
 	$section_len = strlen( $section );
 	$content = substr( $section , $len + 1 , $section_len - $len - 2 );
-	$result = _extract_name_value_pairs( $content, $prefix, $section_name, $attach_name, $variable_delim_char );
+	$result = sed_lib_extract_name_value_pairs( $content, $prefix, $section_name, $attach_name, $variable_delim_char );
 	return $result;
 	}
 
+/* Array print keys: echo's the keys from a given array in a more compact format than print_r */
+function sed_lib_print_keys( $input, $postfix = '', $columnated = false ) {
+	if( !is_array( $input ) )
+		return;
+		
+	echo( 'Array'.(($columnated)? br : '').'( '.(($columnated)? br : '') );
+	foreach( $input as $k=>$v )
+		echo( "[$k] ".(($columnated)? br : '') );
+	echo( ')'.$postfix );
+	}
+
+/* Array print values: echo's the values from a given array in a more compact format than print_r */
+function sed_lib_print_vals( $input, $postfix = '', $columnated = false ) {
+	if( !is_array( $input ) )
+		return;
+		
+	echo( 'Array'.(($columnated)? br : '').'( '.(($columnated)? br : '') );
+	foreach( $input as $k=>$v )
+		echo( "[$v] ".(($columnated) ? br : '') );
+	echo( ')'.$postfix );
+	}
 
 
 # --- END PLUGIN CODE ---
