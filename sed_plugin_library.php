@@ -8,7 +8,7 @@ $plugin['description'] = "Helper functions for sed plugins.";
 
 $plugin['type'] = 2; // 0 = regular plugin; public only, 1 = admin plugin; public + admin, 2 = library
 
-@include_once('zem_tpl.php');
+@include_once('../zem_tpl.php');
 
 if (0) {
 ?>
