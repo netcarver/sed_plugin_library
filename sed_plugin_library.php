@@ -2,7 +2,7 @@
 
 $plugin['name'] = 'sed_plugin_library';
 $plugin['version'] = '0.3';
-$plugin['author'] = 'Stephen Dickinson';
+$plugin['author'] = 'Netcarver';
 $plugin['author_uri'] = 'http://txp-plugins.netcarving.com';
 $plugin['description'] = "Helper functions for sed plugins.";
 
@@ -12,7 +12,7 @@ $plugin['type'] = 2; // 0 = regular plugin; public only, 1 = admin plugin; publi
 
 if (0) {
 ?>
-<!-- CSS 
+<!-- CSS
 # --- BEGIN PLUGIN CSS ---
 <style type="text/css">
 div#sed_help td { vertical-align:top; }
@@ -47,9 +47,9 @@ h2(#functions). Function Listing
 
 h2(#formats). Formats
 
-*packed string* :: _section_ ['|' _section_ ] 
-*section*       :: section-name '(' _variable-list_ ')'  
-*variable-list* :: name='value' [ ';' variable-list ] 
+*packed string* :: _section_ ['|' _section_ ]
+*section*       :: section-name '(' _variable-list_ ')'
+*variable-list* :: name='value' [ ';' variable-list ]
 
 h3(#examples). Examples
 
@@ -88,39 +88,39 @@ v0.1
 # --- BEGIN PLUGIN CODE ---
 
 /* parses a string for a name='value' list */
-function sed_lib_extract_name_value_pairs( $content , $prefix='', $section_name='' , $attach_name=false, $variable_delim_char=';', $sep_char='_' ) 
-	{ 
+function sed_lib_extract_name_value_pairs( $content , $prefix='', $section_name='' , $attach_name=false, $variable_delim_char=';', $sep_char='_' )
+	{
 	$result = array();
-	
+
 	$content = trim( $content );
 	if( empty( $content ) )
 		return $result;
 
 	$chunks = explode( $variable_delim_char , $content );
 	//
-	//	Build the result array mapping 
+	//	Build the result array mapping
 	//  [ variable_x => value_x ]
 	//
 	if( 0 == count( $chunks ) )
 		return $result;
 
-	foreach( $chunks as $chunk ) 
+	foreach( $chunks as $chunk )
 		{
 		$chunk = trim( $chunk );
-		if( empty( $chunk ) ) 
+		if( empty( $chunk ) )
 			continue;
-		
+
 		list( $storage_key, $value ) = explode( '=', $chunk );
-		
+
 		$storage_key = trim($storage_key);
 		if( empty( $storage_key ) )
 			continue;
-		
-		if( $attach_name and !empty($section_name) ) 
+
+		if( $attach_name and !empty($section_name) )
 			$storage_key = trim($section_name).$sep_char.$storage_key;
-		if( !empty( $prefix) ) 
+		if( !empty( $prefix) )
 			$storage_key = trim($prefix).$sep_char.$storage_key;
-		
+
 		$result[ $storage_key ] = trim( $value, " '\"" );
 		}
 	return $result;
@@ -134,13 +134,13 @@ function sed_lib_extract_packed_vars( $packed_string, $prefix='', $attach_name=t
 		return false;
 	//
 	//	Break the packed string on the section boundaries...
-	//	
+	//
 	$sections = explode( $section_char , $packed_string );
 	$count = count( $sections );
-	if( 0 == $count ) 
+	if( 0 == $count )
 		return false;
 
-	foreach( $sections as $section ) 
+	foreach( $sections as $section )
 		{
 		//
 		//	Pull out the section name
@@ -162,13 +162,13 @@ function sed_lib_extract_packed_variable_section( $section_name, $packed_string,
 		return false;
 	//
 	//	Break the packed string on the section boundaries...
-	//	
+	//
 	$sections = explode( $section_char , $packed_string );
 	$count = count( $sections );
-	if( 0 == $count ) 
+	if( 0 == $count )
 		return false;
 	//
-	//	Find the section with the matching prefix. If it is not present 
+	//	Find the section with the matching prefix. If it is not present
 	// then return false.
 	//
 	$found = false;
@@ -178,14 +178,14 @@ function sed_lib_extract_packed_variable_section( $section_name, $packed_string,
 		$s = $sections[$i];
 		if( $s{$len} === '(' )
 			{
-			if( substr( $s , 0 , $len ) == $section_name ) 
+			if( substr( $s , 0 , $len ) == $section_name )
 				{
 				$section = $s;
 				$i = $count;
 				}
 			}
 		}
-	if( '' === $section ) 
+	if( '' === $section )
 		{
 		return false;
 		}
@@ -202,7 +202,7 @@ function sed_lib_extract_packed_variable_section( $section_name, $packed_string,
 function sed_lib_print_keys( $input, $postfix = '', $columnated = false ) {
 	if( !is_array( $input ) )
 		return;
-		
+
 	echo( 'Array'.(($columnated)? br : '').'( '.(($columnated)? br : '') );
 	foreach( $input as $k=>$v )
 		echo( "[$k] ".(($columnated)? br : '') );
@@ -213,7 +213,7 @@ function sed_lib_print_keys( $input, $postfix = '', $columnated = false ) {
 function sed_lib_print_vals( $input, $postfix = '', $columnated = false ) {
 	if( !is_array( $input ) )
 		return;
-		
+
 	echo( 'Array'.(($columnated)? br : '').'( '.(($columnated)? br : '') );
 	foreach( $input as $k=>$v )
 		echo( "[$v] ".(($columnated) ? br : '') );
