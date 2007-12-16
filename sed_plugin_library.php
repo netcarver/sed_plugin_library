@@ -1,12 +1,22 @@
 <?php
 
+$plugin['revision'] = '$LastChangedRevision$';
+
+$revision = @$plugin['revision'];
+if( !empty( $revision ) )
+	{
+	$parts = explode( ' ' , trim( $revision , '$' ) );
+	$revision = $parts[1];
+	if( !empty( $revision ) )
+		$revision = '.' . $revision;
+	}
+
 $plugin['name'] = 'sed_plugin_library';
-$plugin['version'] = '0.3';
+$plugin['version'] = '0.3' . $revision;
 $plugin['author'] = 'Netcarver';
 $plugin['author_uri'] = 'http://txp-plugins.netcarving.com';
-$plugin['description'] = "Helper functions for sed plugins.";
-
-$plugin['type'] = 2; // 0 = regular plugin; public only, 1 = admin plugin; public + admin, 2 = library
+$plugin['description'] = 'Helper functions for sed plugins.';
+$plugin['type'] = 2;
 
 @include_once('../zem_tpl.php');
 
@@ -44,6 +54,7 @@ h2(#functions). Function Listing
 | @sed_lib_extract_packed_variable_section@ | Returns an array of key->value mappings parsed from one section of a _packed-string_. |
 | @sed_lib_print_keys@                      | Echo's the keys of a given array without the values being shown. |
 | @sed_lib_print_vals@                      | Echo's the values of a given array without the keys being shown. |
+| @sed_lib_txp_version@                     | Txp tag that outputs the current installation's version |
 
 h2(#formats). Formats
 
@@ -220,6 +231,12 @@ function sed_lib_print_vals( $input, $postfix = '', $columnated = false ) {
 	echo( ')'.$postfix );
 	}
 
+/* Intended as a tag to output the current txp version */
+function sed_lib_txp_version()
+	{
+	global $prefs;
+	echo $prefs['version'];
+	}
 
 # --- END PLUGIN CODE ---
 
