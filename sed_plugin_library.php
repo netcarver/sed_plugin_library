@@ -235,7 +235,7 @@ function sed_lib_print_vals( $input, $postfix = '', $columnated = false ) {
 function sed_lib_txp_version()
 	{
 	global $prefs;
-	echo $prefs['version'];
+	return $prefs['version'];
 	}
 
 # --- END PLUGIN CODE ---
