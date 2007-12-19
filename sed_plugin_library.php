@@ -12,7 +12,7 @@ if( !empty( $revision ) )
 	}
 
 $plugin['name'] = 'sed_plugin_library';
-$plugin['version'] = '0.3' . $revision;
+$plugin['version'] = '0.4' . $revision;
 $plugin['author'] = 'Netcarver';
 $plugin['author_uri'] = 'http://txp-plugins.netcarving.com';
 $plugin['description'] = 'Helper functions for sed plugins.';
@@ -55,6 +55,7 @@ h2(#functions). Function Listing
 | @sed_lib_print_keys@                      | Echo's the keys of a given array without the values being shown. |
 | @sed_lib_print_vals@                      | Echo's the values of a given array without the keys being shown. |
 | @sed_lib_txp_version@                     | Txp tag that outputs the current installation's version |
+| @sed_lib_home_or_section@                 | Conditional tag tests for homepage or any one of the named set of sections  |
 
 h2(#formats). Formats
 
@@ -77,6 +78,14 @@ Notice that a packed string includes one or more variable lists. Each list is wr
 
 h2(#versions). Version History
 
+v0.4
+
+* Added class @sed_lib_mlp@ to allow easy inclusion of MLP support/string localisation (thanks to Stef Dawson for the idea.)
+* Added tags...
+** @sed_lib_txp_version()@
+** @sed_lib_home_or_section()@
+* Added slightly modified routines from the *pap_contact_cleaner* plugin. This includes wrapping the added fields in a classed @div@.
+
 v0.3
 
 * Renamed functions.
@@ -97,6 +106,10 @@ v0.1
 }
 
 # --- BEGIN PLUGIN CODE ---
+
+#===============================================================================
+#
+#===============================================================================
 
 /* parses a string for a name='value' list */
 function sed_lib_extract_name_value_pairs( $content , $prefix='', $section_name='' , $attach_name=false, $variable_delim_char=';', $sep_char='_' )
@@ -232,11 +245,123 @@ function sed_lib_print_vals( $input, $postfix = '', $columnated = false ) {
 	}
 
 /* Intended as a tag to output the current txp version */
-function sed_lib_txp_version()
+
+#===============================================================================
+#
+#===============================================================================
+if( @txpinterface === 'public' )
 	{
-	global $prefs;
-	return $prefs['version'];
+	register_callback('sed_lib_zemcontact_form',   'zemcontact.form'  );
+	register_callback('sed_lib_zemcontact_submit', 'zemcontact.submit');
+
+	function sed_lib_zemcontact_form()
+		{
+		$field = 	'<div class="screenreader">' .
+					doLabel('Phone') .   finput('text', 'phone', htmlspecialchars(ps('phone')), '', '', '', '', '', 'phone') . '<br />' .
+					doLabel('Address') . finput('text', 'mail' , htmlspecialchars(ps('mail' )), '', '', '', '', '', 'mail') .
+					'</div>';
+		return $field;
+		}
+
+	function sed_lib_zemcontact_submit()
+		{
+		$checking_mail_field  = trim(ps('mail'));
+		$checking_phone_field = trim(ps('phone'));
+
+		$evaluation =& get_zemcontact_evaluator();
+		if ($checking_mail_field != '' || $checking_phone_field != '')
+			$evaluation -> add_zemcontact_status(1);
+
+		return;
+		}
+
+
+	function sed_lib_txp_version()
+		{
+		global $prefs;
+		return $prefs['version'];
+		}
+	/* conditional tag tests for homepage or any one of the named set of sections */
+	function sed_lib_home_or_section( $atts , $thing )
+		{
+		extract( lAtts ( array(
+			'sectlist' => '' ),
+			$atts, 0 ) );
+
+		global $pretext;
+
+		$do_thing =	(
+					$pretext['s'] == "default" &&
+					empty($pretext['c']) &&
+					empty($pretext['q']) &&
+					empty($pretext['pg']));
+
+		if( !$do_thing && !empty( $sectlist ) )	# Not the homepage so test the sections...
+			{
+			$sectlist = do_list($sectlist);
+			$do_thing = in_array( $pretext['s'] , $sectlist );
+			}
+
+		return parse( EvalElse( $thing , $do_thing ) );
+		}
 	}
+
+#===============================================================================
+# MLP Support routines...
+#===============================================================================
+class sed_lib_mlp
+	{
+	var $strings;
+	var $owner;
+	var $prefix;
+	var $lang;
+	var $event;
+
+	function sed_lib_mlp( $plugin_name , $strarray , $ev='common' , $lng='en-gb' )
+		{
+		$this->owner = $plugin_name;
+		$this->prefix = strtolower( strtr($plugin_name, array('-'=>'_') ) );
+		$this->strings = $strarray;
+		$this->lang = $lng;
+		$this->event = $ev;		# valid events are 'public' , 'admin' and 'common'
+		register_callback( array(&$this, 'callback') , 'l10n.enumerate_strings' );
+		}
+
+	function callback()
+		{
+		$r = array(
+			'owner'		=> $this->owner,
+			'prefix'	=> $this->prefix,
+			'lang' 		=> $this->lang,
+			'event' 	=> $this->event,
+			'strings'	=> $this->strings,
+			);
+		return $r;
+		}
+
+	#	Generic lookup
+	#	$what = key to look up, should be a lowercase string.
+	#	$args = any arguments the key is expecting for replacement
+	function gTxt( $what , $args = array() )
+		{
+		global $textarray;
+
+		# Prepare the prefixed key for use
+		#$what = strtolower($what);
+		$key = $this->prefix . '-' . $what;
+
+		# Grab from the global textarray (possibly edited by MLP) if we can
+		if( isset( $textarray[$key]) )
+			$str = $textarray[$key];
+		else
+			# The string isn't in the localised textarray so fallback to using the (non prefixed) string array in the plugin
+			$str = ( isset($this->strings[$what]) ) ? $this->strings[$what] : $what;
+
+		$str = strtr($str, $args);
+		return $str;
+		}
+	}
+
 
 # --- END PLUGIN CODE ---
 
