@@ -317,10 +317,10 @@ class sed_lib_mlp
 	var $lang;
 	var $event;
 
-	function sed_lib_mlp( $plugin_name , $strarray , $ev='common' , $lng='en-gb' )
+	function sed_lib_mlp( $plugin_name , $strarray , $prefix='' , $ev='common' , $lng='en-gb' )
 		{
 		$this->owner = $plugin_name;
-		$this->prefix = strtolower( strtr($plugin_name, array('-'=>'_') ) );
+		$this->prefix = (empty($prefix)) ? strtolower( strtr($plugin_name, array('-'=>'_') ) ) : $prefix;
 		$this->strings = $strarray;
 		$this->lang = $lng;
 		$this->event = $ev;		# valid events are 'public' , 'admin' and 'common'
