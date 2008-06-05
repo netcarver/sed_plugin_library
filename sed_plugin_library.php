@@ -256,7 +256,7 @@ if( @txpinterface === 'public' )
 
 	function sed_lib_zemcontact_form()
 		{
-		$field = 	'<div class="screenreader">' .
+		$field = 	'<div class="screenreader" >' .
 					doLabel('Phone') .   finput('text', 'phone', htmlspecialchars(ps('phone')), '', '', '', '', '', 'phone') . '<br />' .
 					doLabel('Address') . finput('text', 'mail' , htmlspecialchars(ps('mail' )), '', '', '', '', '', 'mail') .
 					'</div>';
@@ -362,7 +362,5 @@ class sed_lib_mlp
 		}
 	}
 
-
 # --- END PLUGIN CODE ---
-
 ?>
