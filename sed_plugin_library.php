@@ -244,7 +244,7 @@ function sed_lib_print_vals( $input, $postfix = '', $columnated = false ) {
 	echo( ')'.$postfix );
 	}
 
-/* Intended as a tag to output the current txp version */
+
 
 #===============================================================================
 #
@@ -275,7 +275,7 @@ if( @txpinterface === 'public' )
 		return;
 		}
 
-
+	/* Intended as a tag to output the current txp version */
 	function sed_lib_txp_version()
 		{
 		global $prefs;
