@@ -251,8 +251,8 @@ function sed_lib_print_vals( $input, $postfix = '', $columnated = false ) {
 #===============================================================================
 if( @txpinterface === 'public' )
 	{
-	register_callback('sed_lib_zemcontact_form',   'zemcontact.form'  );
-	register_callback('sed_lib_zemcontact_submit', 'zemcontact.submit');
+	#register_callback('sed_lib_zemcontact_form',   'zemcontact.form'  );
+	#register_callback('sed_lib_zemcontact_submit', 'zemcontact.submit');
 
 	function sed_lib_zemcontact_form()
 		{
