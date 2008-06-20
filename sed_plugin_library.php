@@ -244,6 +244,26 @@ function sed_lib_print_vals( $input, $postfix = '', $columnated = false ) {
 	echo( ')'.$postfix );
 	}
 
+function sed_lib_radio_set( $vals, $field, $var, $tabindex = '', $id = '' )
+	{
+	$id = ($id) ? $id.'-'.$field : $field;
+
+	if( !is_array($vals) || count($vals) < 2 )
+		$vals = array(
+			'0' => gTxt('no'),
+			'1' => gTxt('yes')
+		);
+
+	foreach ($vals as $a => $b)
+		{
+		$out[] = '<input type="radio" id="'.$id.'-'.$a.'" name="'.$field.'" value="'.$a.'" class="radio"';
+		$out[] = ($a == $var) ? ' checked="checked"' : '';
+		$out[] = ($tabindex) ? ' tabindex="'.$tabindex.'"' : '';
+		$out[] = ' /><label for="'.$id.'-'.$a.'">'.$b.'</label> ';
+		}
+
+	return join('', $out);
+	}
 
 
 #===============================================================================
