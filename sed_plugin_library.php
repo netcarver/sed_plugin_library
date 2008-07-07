@@ -9,91 +9,6 @@ $plugin['type'] = 2;
 
 @include_once('../zem_tpl.php');
 
-if (0) {
-?>
-<!-- CSS
-# --- BEGIN PLUGIN CSS ---
-<style type="text/css">
-div#sed_help td { vertical-align:top; }
-div#sed_help code { font-weight:bold; font: 105%/130% "Courier New", courier, monospace; background-color: #FFFFCC;}
-div#sed_help code.sed_code_tag { font-weight:normal; border:1px dotted #999; background-color: #f0e68c; display:block; margin:10px 10px 20px; padding:10px; }
-div#sed_help a:link, div#sed_help a:visited { color: blue; text-decoration: none; border-bottom: 1px solid blue; padding-bottom:1px;}
-div#sed_help a:hover, div#sed_help a:active { color: blue; text-decoration: none; border-bottom: 2px solid blue; padding-bottom:1px;}
-div#sed_help h1 { color: #369; font: 20px Georgia, sans-serif; margin: 0; text-align: center; }
-div#sed_help h2 { border-bottom: 1px solid black; padding:10px 0 0; color: #369; font: 17px Georgia, sans-serif; }
-div#sed_help h3 { color: #693; font: bold 12px Arial, sans-serif; letter-spacing: 1px; margin: 10px 0 0;text-transform: uppercase;}
-</style>
-# --- END PLUGIN CSS ---
--->
-<!-- HELP
-# --- BEGIN PLUGIN HELP ---
-<div id="sed_help">
-
-h1(#intro). Plugin Library
-
-sed_plugin_library v0.3 (June 18th, 2006)
-
-Provides some useful helper functions for plugins.
-
-h2(#functions). Function Listing
-
-|_. Function                         |_. Description |
-| @sed_lib_extract_name_value_pairs@        | Returns an array of name value pairs from the _variable-list_ it is given. |
-| @sed_lib_extract_packed_vars@             | Returns an array of key->value mappings parsed from all the sections of a _packed-string_. |
-| @sed_lib_extract_packed_variable_section@ | Returns an array of key->value mappings parsed from one section of a _packed-string_. |
-| @sed_lib_print_keys@                      | Echo's the keys of a given array without the values being shown. |
-| @sed_lib_print_vals@                      | Echo's the values of a given array without the keys being shown. |
-| @sed_lib_txp_version@                     | Txp tag that outputs the current installation's version |
-| @sed_lib_home_or_section@                 | Conditional tag tests for homepage or any one of the named set of sections  |
-
-h2(#formats). Formats
-
-*packed string* :: _section_ ['|' _section_ ]
-*section*       :: section-name '(' _variable-list_ ')'
-*variable-list* :: name='value' [ ';' variable-list ]
-
-h3(#examples). Examples
-
-Here is a valid variable-list...
-
-a='1' ; b='2' ; Hello='Goodbye'
-
-Here is a valid packed-string...
-
-copyright(owner='Steve';start='1970')|location(state='sabah')|personal(dob='1/1/01';email='';phone='')
-
-Notice that a packed string includes one or more variable lists. Each list is wrapped in parenthasis, given a prefixed name and separated from the next section by the '|'
- character.
-
-h2(#versions). Version History
-
-v0.4
-
-* Added class @sed_lib_mlp@ to allow easy inclusion of MLP support/string localisation (thanks to Stef Dawson for the idea.)
-* Added tags...
-** @sed_lib_txp_version()@
-** @sed_lib_home_or_section()@
-* Added slightly modified routines from the *pap_contact_cleaner* plugin. This includes wrapping the added fields in a classed @div@.
-
-v0.3
-
-* Renamed functions.
-* Changed help files.
-
-v0.2
-
-* Pulled out the variable list parsing code into a common function @_extract_name_value_pairs@.
-
-v0.1
-
-* Functions to extract packed variables from strings.
-
-</div>
-# --- END PLUGIN HELP ---
--->
-<?php
-}
-
 # --- BEGIN PLUGIN CODE ---
 
 #===============================================================================
@@ -372,4 +287,82 @@ class sed_lib_mlp
 	}
 
 # --- END PLUGIN CODE ---
+/*
+# --- BEGIN PLUGIN CSS ---
+<style type="text/css">
+div#sed_help td { vertical-align:top; }
+div#sed_help code { font-weight:bold; font: 105%/130% "Courier New", courier, monospace; background-color: #FFFFCC;}
+div#sed_help code.sed_code_tag { font-weight:normal; border:1px dotted #999; background-color: #f0e68c; display:block; margin:10px 10px 20px; padding:10px; }
+div#sed_help a:link, div#sed_help a:visited { color: blue; text-decoration: none; border-bottom: 1px solid blue; padding-bottom:1px;}
+div#sed_help a:hover, div#sed_help a:active { color: blue; text-decoration: none; border-bottom: 2px solid blue; padding-bottom:1px;}
+div#sed_help h1 { color: #369; font: 20px Georgia, sans-serif; margin: 0; text-align: center; }
+div#sed_help h2 { border-bottom: 1px solid black; padding:10px 0 0; color: #369; font: 17px Georgia, sans-serif; }
+div#sed_help h3 { color: #693; font: bold 12px Arial, sans-serif; letter-spacing: 1px; margin: 10px 0 0;text-transform: uppercase;}
+</style>
+# --- END PLUGIN CSS ---
+# --- BEGIN PLUGIN HELP ---
+<div id="sed_help">
+
+h1(#intro). Plugin Library
+
+sed_plugin_library v0.3 (June 18th, 2006)
+
+Provides some useful helper functions for plugins.
+
+h2(#functions). Function Listing
+
+|_. Function                         |_. Description |
+| @sed_lib_extract_name_value_pairs@        | Returns an array of name value pairs from the _variable-list_ it is given. |
+| @sed_lib_extract_packed_vars@             | Returns an array of key->value mappings parsed from all the sections of a _packed-string_. |
+| @sed_lib_extract_packed_variable_section@ | Returns an array of key->value mappings parsed from one section of a _packed-string_. |
+| @sed_lib_print_keys@                      | Echo's the keys of a given array without the values being shown. |
+| @sed_lib_print_vals@                      | Echo's the values of a given array without the keys being shown. |
+| @sed_lib_txp_version@                     | Txp tag that outputs the current installation's version |
+| @sed_lib_home_or_section@                 | Conditional tag tests for homepage or any one of the named set of sections  |
+
+h2(#formats). Formats
+
+*packed string* :: _section_ ['|' _section_ ]
+*section*       :: section-name '(' _variable-list_ ')'
+*variable-list* :: name='value' [ ';' variable-list ]
+
+h3(#examples). Examples
+
+Here is a valid variable-list...
+
+a='1' ; b='2' ; Hello='Goodbye'
+
+Here is a valid packed-string...
+
+copyright(owner='Steve';start='1970')|location(state='sabah')|personal(dob='1/1/01';email='';phone='')
+
+Notice that a packed string includes one or more variable lists. Each list is wrapped in parenthasis, given a prefixed name and separated from the next section by the '|'
+ character.
+
+h2(#versions). Version History
+
+v0.4
+
+* Added class @sed_lib_mlp@ to allow easy inclusion of MLP support/string localisation (thanks to Stef Dawson for the idea.)
+* Added tags...
+** @sed_lib_txp_version()@
+** @sed_lib_home_or_section()@
+* Added slightly modified routines from the *pap_contact_cleaner* plugin. This includes wrapping the added fields in a classed @div@.
+
+v0.3
+
+* Renamed functions.
+* Changed help files.
+
+v0.2
+
+* Pulled out the variable list parsing code into a common function @_extract_name_value_pairs@.
+
+v0.1
+
+* Functions to extract packed variables from strings.
+
+</div>
+# --- END PLUGIN HELP ---
+*/
 ?>
