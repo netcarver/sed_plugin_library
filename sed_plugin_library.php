@@ -1,7 +1,7 @@
 <?php
 
 $plugin['name'] = 'sed_plugin_library';
-$plugin['version'] = '0.4';
+$plugin['version'] = '0.5';
 $plugin['author'] = 'Netcarver';
 $plugin['author_uri'] = 'http://txp-plugins.netcarving.com';
 $plugin['description'] = 'Helper functions for sed plugins.';
