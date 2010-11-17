@@ -230,59 +230,62 @@ if( @txpinterface === 'public' )
 		}
 	}
 
-#===============================================================================
-# MLP Support routines...
-#===============================================================================
-class sed_lib_mlp
+if (!class_exists('sed_lib_mlp'))
 	{
-	var $strings;
-	var $owner;
-	var $prefix;
-	var $lang;
-	var $event;
-
-	function sed_lib_mlp( $plugin_name , $strarray , $prefix='' , $ev='common' , $lng='en-gb' )
+	#===============================================================================
+	# MLP Support routines...
+	#===============================================================================
+	class sed_lib_mlp
 		{
-		$this->owner = $plugin_name;
-		$this->prefix = (empty($prefix)) ? strtolower( strtr($plugin_name, array('-'=>'_') ) ) : $prefix;
-		$this->strings = $strarray;
-		$this->lang = $lng;
-		$this->event = $ev;		# valid events are 'public' , 'admin' and 'common'
-		register_callback( array(&$this, 'callback') , 'l10n.enumerate_strings' );
-		}
+		var $strings;
+		var $owner;
+		var $prefix;
+		var $lang;
+		var $event;
 
-	function callback()
-		{
-		$r = array(
-			'owner'		=> $this->owner,
-			'prefix'	=> $this->prefix,
-			'lang' 		=> $this->lang,
-			'event' 	=> $this->event,
-			'strings'	=> $this->strings,
-			);
-		return $r;
-		}
+		function sed_lib_mlp( $plugin_name , $strarray , $prefix='' , $ev='common' , $lng='en-gb' )
+			{
+			$this->owner = $plugin_name;
+			$this->prefix = (empty($prefix)) ? strtolower( strtr($plugin_name, array('-'=>'_') ) ) : $prefix;
+			$this->strings = $strarray;
+			$this->lang = $lng;
+			$this->event = $ev;		# valid events are 'public' , 'admin' and 'common'
+			register_callback( array(&$this, 'callback') , 'l10n.enumerate_strings' );
+			}
 
-	#	Generic lookup
-	#	$what = key to look up, should be a lowercase string.
-	#	$args = any arguments the key is expecting for replacement
-	function gTxt( $what , $args = array() )
-		{
-		global $textarray;
+		function callback()
+			{
+			$r = array(
+				'owner'		=> $this->owner,
+				'prefix'	=> $this->prefix,
+				'lang' 		=> $this->lang,
+				'event' 	=> $this->event,
+				'strings'	=> $this->strings,
+				);
+			return $r;
+			}
 
-		# Prepare the prefixed key for use
-		#$what = strtolower($what);
-		$key = $this->prefix . '-' . $what;
+		#	Generic lookup
+		#	$what = key to look up, should be a lowercase string.
+		#	$args = any arguments the key is expecting for replacement
+		function gTxt( $what , $args = array() )
+			{
+			global $textarray;
 
-		# Grab from the global textarray (possibly edited by MLP) if we can
-		if( isset( $textarray[$key]) )
-			$str = $textarray[$key];
-		else
-			# The string isn't in the localised textarray so fallback to using the (non prefixed) string array in the plugin
-			$str = ( isset($this->strings[$what]) ) ? $this->strings[$what] : $what;
+			# Prepare the prefixed key for use
+			#$what = strtolower($what);
+			$key = $this->prefix . '-' . $what;
 
-		$str = strtr($str, $args);
-		return $str;
+			# Grab from the global textarray (possibly edited by MLP) if we can
+			if( isset( $textarray[$key]) )
+				$str = $textarray[$key];
+			else
+				# The string isn't in the localised textarray so fallback to using the (non prefixed) string array in the plugin
+				$str = ( isset($this->strings[$what]) ) ? $this->strings[$what] : $what;
+
+			$str = strtr($str, $args);
+			return $str;
+			}
 		}
 	}
 
